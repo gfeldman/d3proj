@@ -1,0 +1,66 @@
+<html>
+<style>
+path {
+  stroke: #fff;
+}
+</style>
+<body>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script>
+
+var width = 960,
+    height = 700,
+    radius = (Math.min(width, height) / 2) - 10;
+
+var formatNumber = d3.format(",d");
+
+var x = d3.scaleLinear()
+    .domain([0,16])
+    .range([0, 2]);
+
+var y = d3.scaleSqrt()
+    .range([0, radius]);
+
+
+
+
+var partition = d3.partition();
+
+var arc = d3.arc()
+    .startAngle(function(d,i) { return Math.max(0, x(2*i) * Math.PI); })
+    .endAngle(function(d,i) {  return Math.max(0, x(2*(i) + 1) * Math.PI); })
+    .innerRadius(function(d) { return Math.max(0, 20); })
+    .outerRadius(function(d) { return Math.max(0, 100); });
+
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width)
+    .attr("height", height)
+  .append("g")
+    .attr("transform", "translate(" + width / 2 + "," + (height / 2) + ")");
+
+d3.csv("https://raw.githubusercontent.com/gfeldman/d3proj/master/data/data.csv", function(error,data){
+  if (error) {console.log(error);}
+
+  data.forEach( function(row){
+    row.var = +row.var
+  })
+  svg.selectAll("path")
+    .data(data)
+    .enter().append("path")
+    .attr("d", arc)
+    .style("fill",d => "white")
+    .style("stroke",d => "white")
+    .transition()
+    .duration(700)
+    .style("fill",d => d.var == 1 ? "blue": "yellow")
+    .style("stroke",d => d.var == 1 ? "blue": "yellow")
+    .transition(700)
+    .style("fill",d => "white")
+    .style("stroke",d => "white")
+
+  
+});
+</script>
+</body>
+</html>
